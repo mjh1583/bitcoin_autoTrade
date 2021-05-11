@@ -1,8 +1,8 @@
 import pyupbit
 
 # 로그인
-access = "bpuqrdNfkU6Z9jCDdfS7RxBj5xZsLtxVmpAuv4L6"          # 본인 값으로 변경
-secret = "QjEuvoNnZ9MABI1HHYvFEpcxSeKOjb6JIUnih5Z6"          # 본인 값으로 변경
+access = ""          # 본인 값으로 변경
+secret = ""          # 본인 값으로 변경
 upbit = pyupbit.Upbit(access, secret)
 
 # 잔고조회
