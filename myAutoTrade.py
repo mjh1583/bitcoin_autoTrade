@@ -78,9 +78,12 @@ while True:
             target_k_value = target[1]
             # 코인 종목
             target_coin = target[2]
-
-        now = datetime.datetime.now()
+        
+        # 현재 시간
+        now = datetime.datetime.now() 
+        # 장 시작 시간
         start_time = get_start_time(target_coin)
+        # 장 마감 시간
         end_time = start_time + datetime.timedelta(days=1)
 
         if start_time < now < end_time - datetime.timedelta(seconds=10):
@@ -90,13 +93,15 @@ while True:
             if target_price < current_price and ma15 < current_price:
                 krw = get_balance("KRW")
                 if krw > 5000:
-                    buy_result = pyupbit.buy_market_order(target_coin, krw * 0.9995)
+                    buy_result = pyupbit.buy_market_order(target_coin, krw * 0.9995) # 시장가 매수
                     buy_cost = buy_result['price']
                     post_message(myToken,"#bitcoinautotrade", target_coin + " buy : " +str(buy_result))
         else:
+            # 하루가 지났으므로 다시 타겟을 설정하도록 flag 수정
+            flag = 0
             btc = get_balance(target_coin)
-            if btc > 0.00015: # 여기 값 바꿔야 함 코인의 원화 가격이 5000원 이상일때
-                sell_result = pyupbit.sell_market_order(target_coin, btc * 0.9995)
+            if btc > 0.00015: # 여기 값 바꿔야 함 코인의 원화 가격이 5000원 이상일때, 근데 항상 10000원 이상씩 가지고 있을텐데 굳이 필요한가? 빼도 될듯함
+                sell_result = pyupbit.sell_market_order(target_coin, btc * 0.9995) # 시장가 매도
                 post_message(myToken,"#bitcoinautotrade", target_coin + " sell : " +str(sell_result))
         time.sleep(1)
     except Exception as e:
