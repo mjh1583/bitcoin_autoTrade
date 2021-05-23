@@ -2,15 +2,17 @@ import pyupbit
 
 upper_list = [] # 상승장 종목을 담을 리스트
 
+# 상승장인지 하락장인지 판별할 함수
 def bull_market(ticker):
     df = pyupbit.get_ohlcv(ticker)
     ma5 = df['close'].rolling(window=5).mean()
     last_ma5 = ma5[-2]
     price = pyupbit.get_current_price(ticker)
 
-    if price > last_ma5:
+    if price > last_ma5: # 이동평균보다 크면 상승장
         upper_list.append(ticker)
 
+# 업비트의 KRW 모든 코인들을 상승장인지 판별하여 상승종목들 리턴
 def upper_market():
     tickers = pyupbit.get_tickers(fiat="KRW")
 
