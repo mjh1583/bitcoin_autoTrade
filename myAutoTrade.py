@@ -108,14 +108,14 @@ while True:
             # 각 상승장 종목 별 best K 값 구하기
             bestk_list = bestk.get_best_k(upper_list)
             target = bestk.today_coin(bestk_list)
-            #print(target)
+            print(target)
 
             # k값
             target_k_value = target[0][1]
-            #print(target_k_value)
+            print(target_k_value)
             # 코인 종목
             target_coin = target[1]
-            #print(target_coin)
+            print(target_coin)
             print("목표 설정 완료")
         
         # 현재 시간
