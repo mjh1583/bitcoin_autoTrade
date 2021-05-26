@@ -42,7 +42,7 @@ def get_ma15(ticker):
 
 def get_balance(coin):
     """잔고 조회"""
-    balances = pyupbit.get_balances()
+    balances = upbit.get_balances()
     for b in balances:
         if b['currency'] == coin:
             if b['balance'] is not None:
@@ -55,11 +55,16 @@ def get_current_price(ticker):
     return pyupbit.get_orderbook(tickers=ticker)[0]["orderbook_units"][0]["ask_price"]
 
 def sell_coin(target_coin, btc):
-    sell_result = pyupbit.sell_market_order(target_coin, btc * 0.9995) # 시장가 매도
+    print("코인 매도 조건문 진입") 
+    sell_result = upbit.sell_market_order(target_coin, btc * 0.9995) # 시장가 매도
     post_message(myToken, botName, target_coin + " sell : " + str(sell_result))
     # 매도 했으므로 다시 코인을 조회하기 위하여 flag 값 수정
     global flag
     flag = 0
+    # 매도 했으므로 코인 구매가격 초기화
+    global buy_cost
+    buy_cost = 0
+    print("코인 매도 완료")
 
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
@@ -98,7 +103,7 @@ buy_time = 0
 # 무한 반복으로 자동 매매 실행
 while True:
     try:
-        # 처음 진입 or 하루가 지남 or 보유 금액이 5000원 이상(flag = 0) 타겟으로 할 코인과 k값 설정
+        #처음 진입 or 하루가 지남 or 보유 금액이 5000원 이상(flag = 0) 타겟으로 할 코인과 k값 설정
         if flag == 0:
             flag = 1
             # 상승장 종목 리스트
@@ -119,6 +124,9 @@ while True:
             print("목표 설정 완료")
         
         # 현재 시간
+        # target_coin = "KRW-ENJ"
+        # target_k_value = 0.01
+
         now = datetime.datetime.now() 
         
         # 장 시작 시간 (09:00)
@@ -131,15 +139,19 @@ while True:
         if start_time < now < end_time - datetime.timedelta(seconds=10):
             print("자동 매매 조건문 진입")
             target_price = get_target_price(target_coin, target_k_value) # 목표코인의 매수 목표 가격
+            print("목표가격 : ", target_price)
             ma15 = get_ma15(target_coin) # 목표 코인의 15일 이동평균
+            print("이동평균가격 : ", ma15)
             current_price = get_current_price(target_coin) # 목표 코인의 현재 가격
-
+            print("현재가격 : ", current_price)
             # 매도
             # 보유한 코인이 있으면
             if buy_cost > 0:
                 print("현재 코인 소유중")
+                
                 # 현재 보유한 코인의 잔액 조회
-                btc = get_balance(target_coin)
+                btc = get_balance(target_coin[4:])
+                print("btc : ", btc)
 
                 # 현재 가격이 구매한 가격의 10% 보다 크고 구매시간으로 부터 1시간 이내라면
                 if current_price >= buy_cost * 1.1 and now <= buy_time + datetime.timedelta(hours=1):
@@ -151,26 +163,26 @@ while True:
                     대신 비트코인의 구매가격을 현재 10%이상 오른 가격으로 바꿔줌으로써 하락이 발생할때 매도가능하게 함
                     '''
                     print("코인 떡상중")
-                   
+
+                print("현재 가격 : ", current_price)
+                print("산 가격 : ", buy_cost * 0.995)   
                 # 현재 가격이 구매한 가격에서 2% 이상 떨어지면
-                if current_price <= buy_cost * 0.98:
-                    print("코인 매도 조건문 진입")
+                if current_price <= buy_cost * 0.995:
                     sell_coin(target_coin, btc)
-                    print("코인 매도 완료")
-                   
+                     
             # 매수
             # 매수목표가격보다 현재가격이 높고 15일 이동평균선보다 현재가가 높으면
             if target_price < current_price and ma15 < current_price:
-                print("매수 조건문 진입")
+                print("매수 조건 만족")
                 krw = get_balance("KRW") # 현재 잔액 확인(지갑에 든 한화(한국돈))
 
                 # 보유한 현금이 5000원이상(업비트에서 5000원 이상만 결제 가능)
                 if krw >= 5000:
                     print("코인 매수 조건문 진입")
-                    buy_result = pyupbit.buy_market_order(target_coin, krw * 0.9995) # 시장가 매수
-                    buy_cost = buy_result['price'] # 현재 보유한 비트코인의 구매 가격
+                    buy_result = upbit.buy_market_order(target_coin, krw * 0.9995) # 시장가 매수
+                    buy_cost = current_price # 현재 보유한 비트코인의 구매 가격
                     buy_time = datetime.datetime.now() # 비트코인 구매 시간
-                    print(target_coin + " 매수 가격 : " + buy_cost)
+                    print(target_coin ," 매수 가격 : " , buy_cost)
                     post_message(myToken, botName, target_coin + " buy : " + str(buy_result))
                     print("코인 매수 완료")
         
@@ -178,16 +190,15 @@ while True:
         else:
             print("하루가 지났음")
             # 하루가 지났으므로 다시 타겟을 설정하도록 flag 수정
-            btc = get_balance(target_coin) # 매수한 코인의 잔액 조회
+            btc = get_balance(target_coin[4:]) # 매수한 코인의 잔액 조회
             #if btc > 0.00015: # 여기 값 바꿔야 함 코인의 원화 가격이 5000원 이상일때, 근데 항상 10000원 이상씩 가지고 있을텐데 굳이 필요한가? 빼도 될듯함
             # 보유한 비트코인이 있으면
-            if btc > 0:
-                print("코인 매도 조건문 진입")
+            if btc > 0:              
                 sell_coin(target_coin, btc)
-                print("코인 매도 완료")
-                
-        # 1초 쉬어줌
-        time.sleep(1)
+             
+        # 10초 쉬어줌
+        time.sleep(10)
+
     # 에러 발생시 예외 처리
     except Exception as e:
         print(e)

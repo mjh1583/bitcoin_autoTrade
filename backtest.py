@@ -3,7 +3,8 @@ import pyupbit
 import numpy as np
 
 # OHLCV(open, high, low, close, volume)로 당일 시가, 고가, 저가, 종가, 거래량에 대한 데이터
-df = pyupbit.get_ohlcv("KRW-BTC", count=7)
+# df = pyupbit.get_ohlcv("KRW-BTC", interval="day", count=7)
+df = pyupbit.get_ohlcv("KRW-BTC", interval="hour", count=7)
 
 # 변동성 돌파 시준 범위 계산, (고가-저가) * k값
 df['range'] = (df['high'] - df['low']) * 0.1
@@ -23,6 +24,21 @@ df['dd'] = (df['hpr'].cummax() - df['hpr']) / df['hpr'].cummax() * 100
 
 # MDD 계산
 print("MDD(%): ", df['dd'].max())
+
+# Access Key 값
+access = ""
+secret = ""
+
+upbit = pyupbit.Upbit(access, secret)
+target_coin = "KRW-SBD"
+print(target_coin[4:])
+balances = upbit.get_balances()
+for b in balances:
+    if b['currency'] == "SBD":
+        if b['balance'] is not None:
+            print("잔액 : ", float(b['balance']))
+        else:
+            print("no money")
 
 # 엑셀로 출력
 # df.to_excel("dd.xlsx")
