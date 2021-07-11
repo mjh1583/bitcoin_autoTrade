@@ -21,6 +21,8 @@ def upper_market():
 
     return upper_list
 
+list = upper_market()
+print(list)
 
 # Ubuntu 서버 명령어
 # (*추가)한국 기준으로 서버 시간 설정: sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime

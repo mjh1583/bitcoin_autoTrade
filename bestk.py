@@ -22,7 +22,8 @@ from pprint import pprint
 
 # k값에 대한 수익률 반환 함수
 def get_ror(ticker, k):
-    df = pyupbit.get_ohlcv(ticker, count=7)
+    # 최근 10분 데이터 조회
+    df = pyupbit.get_ohlcv(ticker, interval="minute1", count=10)
     df['range'] = (df['high'] - df['low']) * k
     df['target'] = df['open'] + df['range'].shift(1)
 
@@ -60,6 +61,8 @@ def today_coin(bestk_list):
     #print(target)
     return target
             
-# upper_list = ["KRW-EMC2", "KRW-SOLVE", "KRW-DOGE"]
+# upper_list = ['KRW-BTC', 'KRW-ETH', 'KRW-NEO', 'KRW-MTL', 'KRW-LTC', 'KRW-XRP', 'KRW-ETC', 'KRW-OMG', 'KRW-SNT', 'KRW-XEM', 'KRW-QTUM', 'KRW-LSK', 'KRW-STEEM', 'KRW-XLM', 'KRW-ARK', 'KRW-STORJ', 'KRW-REP', 'KRW-ADA', 'KRW-SBD', 'KRW-POWR', 'KRW-BTG', 'KRW-ICX', 'KRW-EOS', 'KRW-TRX', 'KRW-SC', 'KRW-ONT', 'KRW-ZIL', 'KRW-POLY', 'KRW-ZRX', 'KRW-BCH', 'KRW-BAT', 'KRW-IOST', 'KRW-CVC', 'KRW-IOTA', 'KRW-ONG', 'KRW-GAS', 'KRW-UPP', 'KRW-ELF', 'KRW-KNC', 'KRW-BSV', 'KRW-THETA', 'KRW-EDR', 'KRW-QKC', 'KRW-BTT', 'KRW-ENJ', 'KRW-TFUEL', 'KRW-MANA', 'KRW-AERGO', 'KRW-ATOM', 'KRW-CRE', 'KRW-MLK', 'KRW-ORBS', 'KRW-VET', 'KRW-CHZ', 'KRW-STMX', 'KRW-DKA', 'KRW-KAVA', 'KRW-LINK', 'KRW-XTZ', 'KRW-BORA', 'KRW-JST', 'KRW-CRO', 'KRW-TON', 'KRW-SXP', 'KRW-MARO', 'KRW-DOT', 'KRW-SRM', 'KRW-PCI', 'KRW-BCHA', 'KRW-GLM', 'KRW-META', 'KRW-HUM', 'KRW-FLOW', 'KRW-DAWN', 'KRW-AXS', 'KRW-STX']
 # bestk_list = get_best_k(upper_list)
+# print(bestk_list)
 # today_coin(bestk_list)
+# print(today_coin)

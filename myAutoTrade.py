@@ -17,7 +17,7 @@ botName = "#bitcoinautotrade"
 def post_message(token, channel, text):
     """슬랙 메시지 전송"""
     response = requests.post("https://slack.com/api/chat.postMessage",
-        headers={"Authorization": "Bearer "+token},
+        headers={"Authorization": "Bearer " + token},
         data={"channel": channel,"text": text}
     )
 
@@ -103,7 +103,7 @@ buy_time = 0
 # 무한 반복으로 자동 매매 실행
 while True:
     try:
-        #처음 진입 or 하루가 지남 or 보유 금액이 5000원 이상(flag = 0) 타겟으로 할 코인과 k값 설정
+        #처음 진입 or 하루가 지남 or 코인 매도(flag = 0) 타겟으로 할 코인과 k값 설정
         if flag == 0:
             flag = 1
             # 상승장 종목 리스트
@@ -165,9 +165,9 @@ while True:
                     print("코인 떡상중")
 
                 print("현재 가격 : ", current_price)
-                print("산 가격 : ", buy_cost * 0.995)   
+                print("산 가격 : ", buy_cost)   
                 # 현재 가격이 구매한 가격에서 2% 이상 떨어지면
-                if current_price <= buy_cost * 0.995:
+                if current_price <= buy_cost * 0.98:
                     sell_coin(target_coin, btc)
                      
             # 매수
